@@ -76,7 +76,7 @@ function renderMatch(match) {
     : `<span class="match-status status-upcoming">Upcoming</span>`;
 
   const roundHtml = round ? `<span class="match-round">${round}</span>` : '';
-  const courtHtml = court ? `<span class="match-court">📍 ${court}</span>` : '';
+  const courtHtml = court ? `<span class="match-court">${court}</span>` : '';
 
   const scoreCols = renderSets(match);
   const p1IsWinner = isPast && winner === 'p1';
@@ -285,8 +285,6 @@ function updateLiveBadge(count) {
 
 // ── INIT ──
 
-document.getElementById('header-date').textContent =
-  new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
 // Tab switching
 document.querySelectorAll('.tab-btn').forEach(btn => {

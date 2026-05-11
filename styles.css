@@ -256,7 +256,10 @@ body {
 .match-time,
 .match-duration,
 .section-label,
-.header-date {
+.set-score,
+.games-badge,
+.score-placeholder,
+.live-score-point {
   font-family: 'JetBrains Mono', monospace;
   text-transform: uppercase;
 }
@@ -283,9 +286,7 @@ body {
   background: var(--green-dim);
   padding: 2px 8px;
   border-radius: 20px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  margin-left: auto;
 }
 
 /* ── PLAYERS ── */
