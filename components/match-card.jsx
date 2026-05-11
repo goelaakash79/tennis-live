@@ -106,7 +106,7 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
 
   const timeLabel = [fmtDate(date), fmtTime(match.startMs)].filter(Boolean).join(' · ');
   const msToStart = (match.startMs || 0) - Date.now();
-  const showCountdown = isUpcoming && msToStart > 0 && msToStart <= 4 * 60 * 60 * 1000;
+  const showCountdown = isUpcoming && msToStart > 0 && msToStart <= 2 * 60 * 60 * 1000;
   const totalMins = Math.ceil(msToStart / 60000);
   const leftHours = Math.floor(totalMins / 60);
   const leftMins = totalMins % 60;
