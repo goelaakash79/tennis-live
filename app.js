@@ -157,6 +157,29 @@ function renderGroups(matches) {
   return groupByTournament(matches).map(g => renderTournamentGroup(g.tournament, g.matches)).join('');
 }
 
+function renderFlat(matches, descending = false) {
+  if (!matches.length) return renderEmpty();
+  const sorted = [...matches].sort((a, b) =>
+    descending ? (b.startMs || 0) - (a.startMs || 0) : (a.startMs || 0) - (b.startMs || 0)
+  );
+  let lastTournId = null;
+  return sorted.map(m => {
+    let header = '';
+    if (m.tournament.id !== lastTournId) {
+      lastTournId = m.tournament.id;
+      const tourBadge = m.tournament.tour
+        ? `<span class="tournament-tour tour-${m.tournament.tour.toLowerCase()}">${m.tournament.tour}</span>`
+        : '';
+      header = `<div class="flat-tourn-label">
+        <span class="tournament-flag">${m.tournament.flag}</span>
+        <span class="flat-tourn-name">${m.tournament.name}</span>
+        ${tourBadge}
+      </div>`;
+    }
+    return header + renderMatch(m);
+  }).join('');
+}
+
 function renderEmpty(msg = 'No matches right now.') {
   return `<div class="empty-state"><div class="icon">🎾</div><p>${msg}</p></div>`;
 }
@@ -191,29 +214,14 @@ function filterMatches(matches) {
 
 function renderLiveTab(matches) {
   if (!matches.length) return renderEmpty('No live matches at the moment.');
+  if (currentFilter === 'all') return renderFlat(matches);
   return renderGroups(matches);
 }
 
 function renderUpcomingTab(upcoming) {
   if (!upcoming.length) return renderEmpty('No upcoming matches scheduled.');
 
-  const byDate = new Map();
-  upcoming.forEach(m => {
-    const k = localDateFromMs(m.startMs) || m.date || 'Unknown date';
-    if (!byDate.has(k)) byDate.set(k, []);
-    byDate.get(k).push(m);
-  });
-
-  return [...byDate.entries()].map(([date, matches]) => {
-    return `<div class="section-label">${fmtDate(date)}</div>${renderGroups(matches)}`;
-  }).join('');
-}
-
-function renderResultsTab(past) {
-  if (!past.length) return renderEmpty('No results yet today.');
-
-  const sorted = [...past].sort((a, b) => (b.startMs || 0) - (a.startMs || 0));
-
+  const sorted = [...upcoming].sort((a, b) => (a.startMs || 0) - (b.startMs || 0));
   const byDate = new Map();
   sorted.forEach(m => {
     const k = localDateFromMs(m.startMs) || m.date || 'Unknown date';
@@ -222,11 +230,29 @@ function renderResultsTab(past) {
   });
 
   return [...byDate.entries()].map(([date, matches]) => {
-    return `<div class="section-label">${fmtDate(date)}</div>${renderGroups(matches)}`;
+    const body = currentFilter === 'all' ? renderFlat(matches) : renderGroups(matches);
+    return `<div class="section-label">${fmtDate(date)}</div>${body}`;
   }).join('');
 }
 
-// ── REFRESH BUTTON ──
+function renderResultsTab(past) {
+  if (!past.length) return renderEmpty('No results yet today.');
+
+  const sorted = [...past].sort((a, b) => (b.startMs || 0) - (a.startMs || 0));
+  const byDate = new Map();
+  sorted.forEach(m => {
+    const k = localDateFromMs(m.startMs) || m.date || 'Unknown date';
+    if (!byDate.has(k)) byDate.set(k, []);
+    byDate.get(k).push(m);
+  });
+
+  return [...byDate.entries()].map(([date, matches]) => {
+    const body = currentFilter === 'all' ? renderFlat(matches, true) : renderGroups(matches);
+    return `<div class="section-label">${fmtDate(date)}</div>${body}`;
+  }).join('');
+}
+
+// ── FAB REFRESH ──
 
 const refreshBtn = document.getElementById('refresh-btn');
 
@@ -294,19 +320,22 @@ function updateLiveBadge(count) {
 
 (function () {
   const root = document.documentElement;
-  const btn = document.getElementById('theme-toggle');
+  const lightBtn = document.getElementById('theme-light');
+  const darkBtn  = document.getElementById('theme-dark');
   const stored = localStorage.getItem('theme');
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const isDark = stored ? stored === 'dark' : prefersDark;
 
   function apply(dark) {
     root.setAttribute('data-theme', dark ? 'dark' : 'light');
-    btn.textContent = dark ? '☀︎' : '☾';
     localStorage.setItem('theme', dark ? 'dark' : 'light');
+    lightBtn.classList.toggle('active', !dark);
+    darkBtn.classList.toggle('active', dark);
   }
 
   apply(isDark);
-  btn.addEventListener('click', () => apply(root.getAttribute('data-theme') !== 'dark'));
+  lightBtn.addEventListener('click', () => apply(false));
+  darkBtn.addEventListener('click',  () => apply(true));
 })();
 
 // ── INIT ──

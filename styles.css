@@ -87,17 +87,30 @@ body {
 }
 
 
-.refresh-btn svg {
-  width: 14px;
-  height: 14px;
-  display: block;
+/* ── FAB REFRESH ── */
+.fab-refresh {
+  position: fixed;
+  bottom: 28px;
+  right: 20px;
+  z-index: 200;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: var(--green);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  transition: transform 0.15s, box-shadow 0.15s;
 }
-.refresh-btn.spinning svg {
-  animation: spin 0.7s linear infinite;
-}
+.fab-refresh:active { transform: scale(0.92); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.fab-refresh:disabled { opacity: 0.5; cursor: default; }
+.fab-refresh svg { width: 20px; height: 20px; }
+.fab-refresh.spinning svg { animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-.theme-toggle { font-size: 0.95rem; }
 
 /* ── TOUR FILTER ── */
 .tour-filter {
@@ -237,6 +250,25 @@ body {
 .surface-clay { background: rgba(196,108,60,0.15); color: #e08860; }
 .surface-grass { background: rgba(46,204,113,0.15); color: #5ecc88; }
 .surface-indoor { background: rgba(149,117,205,0.15); color: #b39ddb; }
+
+/* ── FLAT TOURNAMENT LABEL (All mode) ── */
+.flat-tourn-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 2px;
+  margin: 16px 0 6px;
+}
+.flat-tourn-label:first-child { margin-top: 0; }
+.flat-tourn-name {
+  flex: 1;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 /* ── MATCH CARD ── */
 .match-card {
