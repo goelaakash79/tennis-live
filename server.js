@@ -36,6 +36,29 @@ function flagFromUrl(url) {
   return { emoji, code: code3.slice(0, 3) };
 }
 
+const TOP_TIER_KEYWORDS = [
+  'australian open', 'roland garros', 'french open', 'wimbledon', 'us open',
+  'indian wells', 'miami open',
+  'monte-carlo', 'monte carlo',
+  'madrid open', 'mutua madrid',
+  'internazionali', "d'italia",
+  'canadian open', 'rogers cup', 'national bank open',
+  'western & southern', 'cincinnati',
+  'shanghai',
+  'paris masters', 'rolex paris',
+  'qatar total', 'qatar open',
+  'dubai duty',
+  'wuhan open',
+  'china open',
+  'atp finals', 'wta finals', 'nitto atp',
+  'olympic',
+];
+
+function isTopTier(name) {
+  const n = (name || '').toLowerCase();
+  return TOP_TIER_KEYWORDS.some(kw => n.includes(kw));
+}
+
 function inferSurface(name) {
   const n = (name || '').toLowerCase();
   if (n.includes('wimbledon') || n.includes('grass') || n.includes('halle') || n.includes("queen's")) return 'grass';
@@ -185,6 +208,7 @@ async function fetchTennis() {
 
   for (const data of [atpData, wtaData]) {
     for (const event of (data.events || [])) {
+      if (!isTopTier(event.name)) continue;
       for (const group of (event.groupings || [])) {
         const slug = group.grouping?.slug || '';
         const isWomens = slug.includes('women');
