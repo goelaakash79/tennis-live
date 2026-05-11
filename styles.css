@@ -140,6 +140,42 @@ body {
 
 .theme-toggle { font-size: 1rem; }
 
+/* ── TOUR FILTER ── */
+.filter-bar {
+  display: flex;
+  justify-content: center;
+  padding: 8px 16px 10px;
+}
+
+.tour-filter {
+  display: inline-flex;
+  background: var(--bg3);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.filter-btn {
+  border: none;
+  background: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 5px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--text2);
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  white-space: nowrap;
+}
+.filter-btn.active {
+  background: var(--bg2);
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
 /* ── TABS ── */
 .tab-nav {
   display: flex;

@@ -177,6 +177,16 @@ async function fetchAllMatches() {
   return res.json();
 }
 
+// ── TOUR FILTER ──
+
+let currentFilter = 'all';
+let lastData = null;
+
+function filterMatches(matches) {
+  if (currentFilter === 'all') return matches;
+  return matches.filter(m => m.tournament.tour.toLowerCase() === currentFilter);
+}
+
 // ── RENDER TABS ──
 
 function renderLiveTab(matches) {
@@ -227,6 +237,13 @@ function setRefreshing(active) {
 
 // ── MAIN LOAD ──
 
+function applyFilter(data) {
+  document.getElementById('tab-live').innerHTML     = renderLiveTab(filterMatches(data.live || []));
+  document.getElementById('tab-upcoming').innerHTML = renderUpcomingTab(filterMatches(data.upcoming || []));
+  document.getElementById('tab-past').innerHTML     = renderResultsTab(filterMatches(data.past || []));
+  updateLiveBadge(filterMatches(data.live || []).length);
+}
+
 async function loadAll() {
   setRefreshing(true);
   document.getElementById('tab-live').innerHTML     = renderSkeleton(3);
@@ -234,11 +251,8 @@ async function loadAll() {
   document.getElementById('tab-past').innerHTML     = renderSkeleton(3);
 
   try {
-    const data = await fetchAllMatches();
-    document.getElementById('tab-live').innerHTML     = renderLiveTab(data.live || []);
-    document.getElementById('tab-upcoming').innerHTML = renderUpcomingTab(data.upcoming || []);
-    document.getElementById('tab-past').innerHTML     = renderResultsTab(data.past || []);
-    updateLiveBadge((data.live || []).length);
+    lastData = await fetchAllMatches();
+    applyFilter(lastData);
   } catch (err) {
     ['tab-live', 'tab-upcoming', 'tab-past'].forEach(id => {
       document.getElementById(id).innerHTML = renderError(err.message);
@@ -251,9 +265,9 @@ async function loadAll() {
 async function refreshLive() {
   setRefreshing(true);
   try {
-    const data = await fetchAllMatches();
-    document.getElementById('tab-live').innerHTML = renderLiveTab(data.live || []);
-    updateLiveBadge((data.live || []).length);
+    lastData = await fetchAllMatches();
+    document.getElementById('tab-live').innerHTML = renderLiveTab(filterMatches(lastData.live || []));
+    updateLiveBadge(filterMatches(lastData.live || []).length);
   } catch (e) { /* silent */ } finally {
     setRefreshing(false);
   }
@@ -309,6 +323,16 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 
 // Manual refresh
 refreshBtn.addEventListener('click', loadAll);
+
+// Tour filter
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    if (lastData) applyFilter(lastData);
+  });
+});
 
 loadAll();
 
