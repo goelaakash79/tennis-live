@@ -36,9 +36,8 @@ function buildSetScores(match) {
     return (
       <div
         key={`p1-${i}`}
-        className={`w-[22px] text-center font-mono text-[0.88rem] font-bold tabular-nums sm:w-[26px] sm:text-[0.95rem] ${
-          won ? 'text-stone-900 dark:text-stone-50' : 'text-stone-600 dark:text-stone-400'
-        } ${isLast ? 'w-6 rounded bg-red-500/10 text-red-600 dark:text-red-400' : ''}`}
+        className={`w-[22px] text-center font-mono text-[0.88rem] font-bold tabular-nums sm:w-[26px] sm:text-[0.95rem] ${won ? 'text-stone-900 dark:text-stone-50' : 'text-stone-600 dark:text-stone-400'
+          } ${isLast ? 'w-6 rounded bg-red-500/10 text-red-600 dark:text-red-400' : ''}`}
       >
         {s.p1}
       </div>
@@ -51,9 +50,8 @@ function buildSetScores(match) {
     return (
       <div
         key={`p2-${i}`}
-        className={`w-[22px] text-center font-mono text-[0.88rem] font-bold tabular-nums sm:w-[26px] sm:text-[0.95rem] ${
-          won ? 'text-stone-900 dark:text-stone-50' : 'text-stone-600 dark:text-stone-400'
-        } ${isLast ? 'w-6 rounded bg-red-500/10 text-red-600 dark:text-red-400' : ''}`}
+        className={`w-[22px] text-center font-mono text-[0.88rem] font-bold tabular-nums sm:w-[26px] sm:text-[0.95rem] ${won ? 'text-stone-900 dark:text-stone-50' : 'text-stone-600 dark:text-stone-400'
+          } ${isLast ? 'w-6 rounded bg-red-500/10 text-red-600 dark:text-red-400' : ''}`}
       >
         {s.p2}
       </div>
@@ -97,23 +95,31 @@ function buildSetScores(match) {
   };
 }
 
-export function MatchCard({ match }) {
+export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
   const { status, round, court, date, p1, p2, winner, currentGame } = match;
   const isLive = status === 'live';
   const isPast = status === 'past';
+  const isUpcoming = status === 'upcoming';
   const scoreCols = buildSetScores(match);
   const p1IsWinner = isPast && winner === 'p1';
   const p2IsWinner = isPast && winner === 'p2';
 
   const timeLabel = [fmtDate(date), fmtTime(match.startMs)].filter(Boolean).join(' · ');
+  const msToStart = (match.startMs || 0) - Date.now();
+  const shouldShowStartsIn = isUpcoming && msToStart > 0 && msToStart <= 60 * 60 * 1000;
+  const minutesToStart = shouldShowStartsIn ? Math.ceil(msToStart / 60000) : 0;
+  const startHours = Math.floor(minutesToStart / 60);
+  const startMinutes = minutesToStart % 60;
+  const startsInLabel = shouldShowStartsIn
+    ? `${startHours > 0 ? `${startHours}h ` : ''}${startMinutes}m left`
+    : '';
 
   return (
     <div
-      className={`mb-2.5 overflow-hidden rounded-[14px] border bg-white transition-transform active:scale-[0.985] dark:bg-stone-900 ${
-        isLive
+      className={`mb-2.5 overflow-hidden rounded-[14px] border bg-white transition-transform active:scale-[0.985] dark:bg-stone-900 ${isLive
           ? 'border-red-500/30 shadow-[0_0_0_1px_rgba(231,76,60,0.1),0_4px_20px_rgba(231,76,60,0.08)]'
           : 'border-stone-200 dark:border-stone-700'
-      }`}
+        }`}
     >
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-stone-200 bg-stone-100 px-3.5 py-2 dark:border-stone-600/40 dark:bg-stone-800">
         {isLive && (
@@ -147,11 +153,10 @@ export function MatchCard({ match }) {
           <div className="flex items-center gap-2.5">
             <PlayerFlag p={p1} />
             <span
-              className={`min-w-0 flex-1 truncate text-[0.9rem] font-semibold tracking-tight sm:text-[0.95rem] ${
-                p1IsWinner
+              className={`min-w-0 flex-1 truncate text-[0.9rem] font-semibold tracking-tight sm:text-[0.95rem] ${p1IsWinner
                   ? 'font-bold text-stone-900 dark:text-stone-50'
                   : 'text-stone-600 dark:text-stone-400'
-              }`}
+                }`}
             >
               {p1.name}
               {p1.rank ? (
@@ -170,11 +175,10 @@ export function MatchCard({ match }) {
           <div className="flex items-center gap-2.5">
             <PlayerFlag p={p2} />
             <span
-              className={`min-w-0 flex-1 truncate text-[0.9rem] font-semibold tracking-tight sm:text-[0.95rem] ${
-                p2IsWinner
+              className={`min-w-0 flex-1 truncate text-[0.9rem] font-semibold tracking-tight sm:text-[0.95rem] ${p2IsWinner
                   ? 'font-bold text-stone-900 dark:text-stone-50'
                   : 'text-stone-600 dark:text-stone-400'
-              }`}
+                }`}
             >
               {p2.name}
               {p2.rank ? (
@@ -192,15 +196,46 @@ export function MatchCard({ match }) {
           <span className="text-[0.8rem] opacity-60">🕐</span>
           {timeLabel}
         </span>
-        {isLive && currentGame ? (
-          <span className="animate-blink rounded-full bg-red-500/10 px-2 py-0.5 font-mono text-[0.72rem] font-bold text-red-600 dark:text-red-400">
-            {currentGame.p1} – {currentGame.p2}
-          </span>
-        ) : match.duration ? (
-          <span className="font-mono text-[0.72rem] text-stone-400 dark:text-stone-500">
-            ⏱ {match.duration}
-          </span>
-        ) : null}
+        <div className="flex items-center gap-2">
+          {shouldShowStartsIn ? (
+            <span className="rounded-full bg-amber-500/15 px-2 py-0.5 font-mono text-[0.72rem] font-bold text-amber-700 dark:text-amber-300">
+              {startsInLabel}
+            </span>
+          ) : isLive && currentGame ? (
+            <span className="animate-blink rounded-full bg-red-500/10 px-2 py-0.5 font-mono text-[0.72rem] font-bold text-red-600 dark:text-red-400">
+              {currentGame.p1} – {currentGame.p2}
+            </span>
+          ) : match.duration ? (
+            <span className="font-mono text-[0.72rem] text-stone-400 dark:text-stone-500">
+              ⏱ {match.duration}
+            </span>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => onToggleFavorite?.(match.id)}
+            aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+            title={isFavorite ? 'Unfavorite' : 'Favorite'}
+            className={`rounded-full p-1.5 transition-colors ${
+              isFavorite
+                ? 'text-red-500 hover:bg-red-500/10'
+                : 'text-stone-400 hover:bg-stone-200 dark:text-stone-500 dark:hover:bg-stone-700'
+            }`}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="16"
+              height="16"
+              fill={isFavorite ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   );

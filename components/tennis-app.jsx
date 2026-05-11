@@ -198,11 +198,13 @@ function ResultsTab({ matches, filter }) {
 export function TennisApp() {
   const [tab, setTab] = useState('live');
   const [tourFilter, setTourFilter] = useState('all');
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [lastData, setLastData] = useState(null);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [skeletonTabs, setSkeletonTabs] = useState(true);
   const [isDark, setIsDark] = useState(null);
+  const [favoriteIds, setFavoriteIds] = useState(new Set());
 
   useEffect(() => {
     setIsDark(document.documentElement.classList.contains('dark'));
@@ -213,20 +215,45 @@ export function TennisApp() {
     navigator.serviceWorker.register('/sw.js').catch(() => { });
   }, []);
 
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('favoriteMatches');
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return;
+      setFavoriteIds(new Set(parsed.map((id) => String(id))));
+    } catch {
+      /* ignore malformed local storage */
+    }
+  }, []);
+
+  const toggleFavorite = useCallback((matchId) => {
+    const key = String(matchId);
+    setFavoriteIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      localStorage.setItem('favoriteMatches', JSON.stringify([...next]));
+      return next;
+    });
+  }, []);
+
   const filtered = useMemo(() => {
     if (!lastData) {
       return { live: [], upcoming: [], past: [] };
     }
     const f = (arr) =>
-      tourFilter === 'all'
-        ? arr
-        : (arr || []).filter((m) => m.tournament.tour.toLowerCase() === tourFilter);
+      (arr || []).filter((m) => {
+        if (tourFilter !== 'all' && m.tournament.tour.toLowerCase() !== tourFilter) return false;
+        if (showFavoritesOnly && !favoriteIds.has(String(m.id))) return false;
+        return true;
+      });
     return {
       live: f(lastData.live || []),
       upcoming: f(lastData.upcoming || []),
       past: f(lastData.past || []),
     };
-  }, [lastData, tourFilter]);
+  }, [lastData, tourFilter, showFavoritesOnly, favoriteIds]);
 
   const loadAll = useCallback(async () => {
     setRefreshing(true);
@@ -281,6 +308,86 @@ export function TennisApp() {
 
   const liveCount = filtered.live.length;
 
+  const cardProps = (match) => ({
+    isFavorite: favoriteIds.has(String(match.id)),
+    onToggleFavorite: toggleFavorite,
+  });
+
+  const renderFlatWithFavorites = (matches, descending = false) => {
+    if (!matches.length) return <EmptyState />;
+    const sorted = [...matches].sort((a, b) =>
+      descending ? (b.startMs || 0) - (a.startMs || 0) : (a.startMs || 0) - (b.startMs || 0),
+    );
+    let lastTournName = null;
+    return (
+      <>
+        {sorted.map((m) => {
+          const showHeader = m.tournament.name !== lastTournName;
+          if (showHeader) lastTournName = m.tournament.name;
+          return (
+            <div key={m.id}>
+              {showHeader ? (
+                <div className="mb-1.5 mt-4 flex items-center gap-2 px-0.5 first:mt-0">
+                  <span className="text-[1.15rem]">{m.tournament.flag}</span>
+                  <span className="min-w-0 flex-1 truncate text-[0.88rem] font-bold tracking-tight">
+                    {m.tournament.name}
+                  </span>
+                </div>
+              ) : null}
+              <MatchCard match={m} {...cardProps(m)} />
+            </div>
+          );
+        })}
+      </>
+    );
+  };
+
+  const renderGroupsWithFavorites = (matches) => {
+    if (!matches.length) return <EmptyState />;
+    return (
+      <>
+        {groupByTournament(matches).map((g) => (
+          <div key={g.tournament.id} className="mb-7">
+            <div className="mb-2.5 flex items-center gap-2.5 px-0.5">
+              <span className="text-[1.3rem] leading-none">{g.tournament.flag}</span>
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[0.9rem] font-bold tracking-tight">{g.tournament.name}</div>
+                {g.tournament.location ? (
+                  <div className="mt-px text-[0.72rem] text-stone-600 dark:text-stone-400">
+                    {g.tournament.location}
+                  </div>
+                ) : null}
+              </div>
+              {g.tournament.tour ? (
+                <span
+                  className={`shrink-0 rounded-full px-2 py-0.5 font-mono text-[0.7rem] font-semibold uppercase tracking-wide ${
+                    g.tournament.tour === 'ATP'
+                      ? 'bg-blue-500/15 text-blue-400'
+                      : 'bg-pink-500/15 text-pink-400'
+                  }`}
+                >
+                  {g.tournament.tour}
+                </span>
+              ) : null}
+              {g.tournament.surface ? (
+                <span
+                  className={`shrink-0 rounded-full px-2 py-0.5 font-mono text-[0.7rem] font-semibold uppercase tracking-wide ${surfaceBadgeClass(
+                    g.tournament.surface,
+                  )}`}
+                >
+                  {g.tournament.surface}
+                </span>
+              ) : null}
+            </div>
+            {g.matches.map((m) => (
+              <MatchCard key={m.id} match={m} {...cardProps(m)} />
+            ))}
+          </div>
+        ))}
+      </>
+    );
+  };
+
   return (
     <div className="mx-auto max-w-[640px]">
       <header className="sticky top-0 z-[100] border-b border-stone-200 bg-stone-50/95 backdrop-blur-md dark:border-stone-600/40 dark:bg-stone-950/95">
@@ -300,29 +407,42 @@ export function TennisApp() {
               </button>
             ))}
           </div>
-          <div className="inline-flex gap-0.5 rounded-full bg-stone-100 p-0.5 dark:bg-stone-800">
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              aria-label="Light mode"
-              onClick={() => applyTheme(false)}
-              className={`rounded-full px-3.5 py-1 font-mono text-[0.72rem] font-bold uppercase tracking-wide ${isDark === false
-                ? 'bg-white text-stone-900 shadow dark:bg-stone-900 dark:text-stone-50'
-                : 'text-stone-600 dark:text-stone-400'
-                }`}
+              aria-label={showFavoritesOnly ? 'Show all matches' : 'Show favorites only'}
+              onClick={() => setShowFavoritesOnly((prev) => !prev)}
+              className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-sm transition-colors ${
+                showFavoritesOnly ? 'text-red-500 dark:text-red-400' : 'text-stone-500 dark:text-stone-400'
+              }`}
+              title={showFavoritesOnly ? 'Favorites only' : 'All matches'}
             >
-              L
+              {showFavoritesOnly ? '♥' : '♡'}
             </button>
-            <button
-              type="button"
-              aria-label="Dark mode"
-              onClick={() => applyTheme(true)}
-              className={`rounded-full px-3.5 py-1 font-mono text-[0.72rem] font-bold uppercase tracking-wide ${isDark === true
-                ? 'bg-white text-stone-900 shadow dark:bg-stone-900 dark:text-stone-50'
-                : 'text-stone-600 dark:text-stone-400'
-                }`}
-            >
-              D
-            </button>
+            <div className="inline-flex gap-0.5 rounded-full bg-stone-100 p-0.5 dark:bg-stone-800">
+              <button
+                type="button"
+                aria-label="Light mode"
+                onClick={() => applyTheme(false)}
+                className={`rounded-full px-3.5 py-1 font-mono text-[0.72rem] font-bold uppercase tracking-wide ${isDark === false
+                  ? 'bg-white text-stone-900 shadow dark:bg-stone-900 dark:text-stone-50'
+                  : 'text-stone-600 dark:text-stone-400'
+                  }`}
+              >
+                L
+              </button>
+              <button
+                type="button"
+                aria-label="Dark mode"
+                onClick={() => applyTheme(true)}
+                className={`rounded-full px-3.5 py-1 font-mono text-[0.72rem] font-bold uppercase tracking-wide ${isDark === true
+                  ? 'bg-white text-stone-900 shadow dark:bg-stone-900 dark:text-stone-50'
+                  : 'text-stone-600 dark:text-stone-400'
+                  }`}
+              >
+                D
+              </button>
+            </div>
           </div>
         </div>
         <nav className="flex gap-1 px-4">
@@ -366,13 +486,87 @@ export function TennisApp() {
         ) : (
           <>
             <div className={tab === 'live' ? 'block' : 'hidden'}>
-              <LiveTab matches={filtered.live} filter={tourFilter} />
+              {filtered.live.length ? (
+                tourFilter === 'all'
+                  ? renderFlatWithFavorites(filtered.live)
+                  : renderGroupsWithFavorites(filtered.live)
+              ) : (
+                <EmptyState
+                  message={
+                    showFavoritesOnly ? 'No favorite live matches at the moment.' : 'No live matches at the moment.'
+                  }
+                />
+              )}
             </div>
             <div className={tab === 'upcoming' ? 'block' : 'hidden'}>
-              <UpcomingTab matches={filtered.upcoming} filter={tourFilter} />
+              {filtered.upcoming.length ? (
+                (() => {
+                  const sorted = [...filtered.upcoming].sort((a, b) => (a.startMs || 0) - (b.startMs || 0));
+                  const byDate = new Map();
+                  sorted.forEach((m) => {
+                    const k = localDateFromMs(m.startMs) || m.date || 'Unknown date';
+                    if (!byDate.has(k)) byDate.set(k, []);
+                    byDate.get(k).push(m);
+                  });
+                  const entries = [...byDate.entries()];
+                  return entries.map(([date, ms], idx) => (
+                    <div key={date}>
+                      <div
+                        className={`mb-3 flex items-center gap-2 px-0.5 font-mono text-[0.72rem] font-bold uppercase tracking-wide text-stone-400 dark:text-stone-500 ${
+                          idx === 0 ? 'mt-0' : 'mt-5'
+                        }`}
+                      >
+                        {fmtDate(date)}
+                        <span className="h-px flex-1 bg-stone-200 dark:bg-stone-600/40" />
+                      </div>
+                      {tourFilter === 'all'
+                        ? renderFlatWithFavorites(ms)
+                        : renderGroupsWithFavorites(ms)}
+                    </div>
+                  ));
+                })()
+              ) : (
+                <EmptyState
+                  message={
+                    showFavoritesOnly
+                      ? 'No favorite upcoming matches scheduled.'
+                      : 'No upcoming matches scheduled.'
+                  }
+                />
+              )}
             </div>
             <div className={tab === 'past' ? 'block' : 'hidden'}>
-              <ResultsTab matches={filtered.past} filter={tourFilter} />
+              {filtered.past.length ? (
+                (() => {
+                  const sorted = [...filtered.past].sort((a, b) => (b.startMs || 0) - (a.startMs || 0));
+                  const byDate = new Map();
+                  sorted.forEach((m) => {
+                    const k = localDateFromMs(m.startMs) || m.date || 'Unknown date';
+                    if (!byDate.has(k)) byDate.set(k, []);
+                    byDate.get(k).push(m);
+                  });
+                  const entries = [...byDate.entries()];
+                  return entries.map(([date, ms], idx) => (
+                    <div key={date}>
+                      <div
+                        className={`mb-3 flex items-center gap-2 px-0.5 font-mono text-[0.72rem] font-bold uppercase tracking-wide text-stone-400 dark:text-stone-500 ${
+                          idx === 0 ? 'mt-0' : 'mt-5'
+                        }`}
+                      >
+                        {fmtDate(date)}
+                        <span className="h-px flex-1 bg-stone-200 dark:bg-stone-600/40" />
+                      </div>
+                      {tourFilter === 'all'
+                        ? renderFlatWithFavorites(ms, true)
+                        : renderGroupsWithFavorites(ms)}
+                    </div>
+                  ));
+                })()
+              ) : (
+                <EmptyState
+                  message={showFavoritesOnly ? 'No favorite results yet today.' : 'No results yet today.'}
+                />
+              )}
             </div>
           </>
         )}
