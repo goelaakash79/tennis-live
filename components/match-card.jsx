@@ -106,19 +106,17 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
 
   const timeLabel = [fmtDate(date), fmtTime(match.startMs)].filter(Boolean).join(' · ');
   const msToStart = (match.startMs || 0) - Date.now();
-  const shouldShowStartsIn = isUpcoming && msToStart > 0 && msToStart <= 60 * 60 * 1000;
-  const minutesToStart = shouldShowStartsIn ? Math.ceil(msToStart / 60000) : 0;
-  const startHours = Math.floor(minutesToStart / 60);
-  const startMinutes = minutesToStart % 60;
-  const startsInLabel = shouldShowStartsIn
-    ? `${startHours > 0 ? `${startHours}h ` : ''}${startMinutes}m left`
-    : '';
+  const showCountdown = isUpcoming && msToStart > 0 && msToStart <= 4 * 60 * 60 * 1000;
+  const totalMins = Math.ceil(msToStart / 60000);
+  const leftHours = Math.floor(totalMins / 60);
+  const leftMins = totalMins % 60;
+  const countdownLabel = `Starts in ${leftHours ? `${leftHours}h ` : ''}${leftMins}m`;
 
   return (
     <div
       className={`mb-2.5 overflow-hidden rounded-[14px] border bg-white transition-transform active:scale-[0.985] dark:bg-stone-900 ${isLive
-          ? 'border-red-500/30 shadow-[0_0_0_1px_rgba(231,76,60,0.1),0_4px_20px_rgba(231,76,60,0.08)]'
-          : 'border-stone-200 dark:border-stone-700'
+        ? 'border-red-500/30 shadow-[0_0_0_1px_rgba(231,76,60,0.1),0_4px_20px_rgba(231,76,60,0.08)]'
+        : 'border-stone-200 dark:border-stone-700'
         }`}
     >
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-stone-200 bg-stone-100 px-3.5 py-2 dark:border-stone-600/40 dark:bg-stone-800">
@@ -154,8 +152,8 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
             <PlayerFlag p={p1} />
             <span
               className={`min-w-0 flex-1 truncate text-[0.9rem] font-semibold tracking-tight sm:text-[0.95rem] ${p1IsWinner
-                  ? 'font-bold text-stone-900 dark:text-stone-50'
-                  : 'text-stone-600 dark:text-stone-400'
+                ? 'font-bold text-stone-900 dark:text-stone-50'
+                : 'text-stone-600 dark:text-stone-400'
                 }`}
             >
               {p1.name}
@@ -176,8 +174,8 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
             <PlayerFlag p={p2} />
             <span
               className={`min-w-0 flex-1 truncate text-[0.9rem] font-semibold tracking-tight sm:text-[0.95rem] ${p2IsWinner
-                  ? 'font-bold text-stone-900 dark:text-stone-50'
-                  : 'text-stone-600 dark:text-stone-400'
+                ? 'font-bold text-stone-900 dark:text-stone-50'
+                : 'text-stone-600 dark:text-stone-400'
                 }`}
             >
               {p2.name}
@@ -197,11 +195,12 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
           {timeLabel}
         </span>
         <div className="flex items-center gap-2">
-          {shouldShowStartsIn ? (
-            <span className="rounded-full bg-amber-500/15 px-2 py-0.5 font-mono text-[0.72rem] font-bold text-amber-700 dark:text-amber-300">
-              {startsInLabel}
+          {showCountdown ? (
+            <span className="rounded-full bg-amber-500/10 px-4 py-0.5 font-mono text-[10px] font-semibold text-amber-800 dark:text-amber-400 uppercase">
+              {countdownLabel}
             </span>
-          ) : isLive && currentGame ? (
+          ) : null}
+          {isLive && currentGame ? (
             <span className="animate-blink rounded-full bg-red-500/10 px-2 py-0.5 font-mono text-[0.72rem] font-bold text-red-600 dark:text-red-400">
               {currentGame.p1} – {currentGame.p2}
             </span>
@@ -215,11 +214,10 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
             onClick={() => onToggleFavorite?.(match.id)}
             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
             title={isFavorite ? 'Unfavorite' : 'Favorite'}
-            className={`rounded-full p-1.5 transition-colors ${
-              isFavorite
-                ? 'text-red-500 hover:bg-red-500/10'
-                : 'text-stone-400 hover:bg-stone-200 dark:text-stone-500 dark:hover:bg-stone-700'
-            }`}
+            className={`rounded-full p-1.5 transition-colors ${isFavorite
+              ? 'text-red-500 hover:bg-red-500/10'
+              : 'text-stone-400 hover:bg-stone-200 dark:text-stone-500 dark:hover:bg-stone-700'
+              }`}
           >
             <svg
               viewBox="0 0 24 24"
