@@ -28,11 +28,10 @@ function TournamentGroup({ tournament, matches }) {
         </div>
         {tour ? (
           <span
-            className={`shrink-0 rounded-full px-2 py-0.5 font-mono text-[0.7rem] font-semibold uppercase tracking-wide ${
-              tour === 'ATP'
-                ? 'bg-blue-500/15 text-blue-400'
-                : 'bg-pink-500/15 text-pink-400'
-            }`}
+            className={`shrink-0 rounded-full px-2 py-0.5 font-mono text-[0.7rem] font-semibold uppercase tracking-wide ${tour === 'ATP'
+              ? 'bg-blue-500/15 text-blue-400'
+              : 'bg-pink-500/15 text-pink-400'
+              }`}
           >
             {tour}
           </span>
@@ -155,9 +154,8 @@ function UpcomingTab({ matches, filter }) {
       {entries.map(([date, ms], idx) => (
         <div key={date}>
           <div
-            className={`mb-3 flex items-center gap-2 px-0.5 font-mono text-[0.72rem] font-bold uppercase tracking-wide text-stone-400 dark:text-stone-500 ${
-              idx === 0 ? 'mt-0' : 'mt-5'
-            }`}
+            className={`mb-3 flex items-center gap-2 px-0.5 font-mono text-[0.72rem] font-bold uppercase tracking-wide text-stone-400 dark:text-stone-500 ${idx === 0 ? 'mt-0' : 'mt-5'
+              }`}
           >
             {fmtDate(date)}
             <span className="h-px flex-1 bg-stone-200 dark:bg-stone-600/40" />
@@ -184,9 +182,8 @@ function ResultsTab({ matches, filter }) {
       {entries.map(([date, ms], idx) => (
         <div key={date}>
           <div
-            className={`mb-3 flex items-center gap-2 px-0.5 font-mono text-[0.72rem] font-bold uppercase tracking-wide text-stone-400 dark:text-stone-500 ${
-              idx === 0 ? 'mt-0' : 'mt-5'
-            }`}
+            className={`mb-3 flex items-center gap-2 px-0.5 font-mono text-[0.72rem] font-bold uppercase tracking-wide text-stone-400 dark:text-stone-500 ${idx === 0 ? 'mt-0' : 'mt-5'
+              }`}
           >
             {fmtDate(date)}
             <span className="h-px flex-1 bg-stone-200 dark:bg-stone-600/40" />
@@ -213,7 +210,7 @@ export function TennisApp() {
 
   useEffect(() => {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js').catch(() => { });
   }, []);
 
   const filtered = useMemo(() => {
@@ -294,11 +291,10 @@ export function TennisApp() {
                 key={f}
                 type="button"
                 onClick={() => setTourFilter(f)}
-                className={`rounded-full px-3.5 py-1 font-mono text-[0.72rem] font-bold uppercase tracking-wide transition-colors ${
-                  tourFilter === f
-                    ? 'bg-white text-stone-900 shadow dark:bg-stone-900 dark:text-stone-50'
-                    : 'text-stone-600 dark:text-stone-400'
-                }`}
+                className={`rounded-full px-3.5 py-1 font-mono text-[0.72rem] font-bold uppercase tracking-wide transition-colors ${tourFilter === f
+                  ? 'bg-white text-stone-900 shadow dark:bg-stone-900 dark:text-stone-50'
+                  : 'text-stone-600 dark:text-stone-400'
+                  }`}
               >
                 {f === 'all' ? 'All' : f.toUpperCase()}
               </button>
@@ -309,11 +305,10 @@ export function TennisApp() {
               type="button"
               aria-label="Light mode"
               onClick={() => applyTheme(false)}
-              className={`rounded-full px-3.5 py-1 font-mono text-[0.72rem] font-bold uppercase tracking-wide ${
-                isDark === false
-                  ? 'bg-white text-stone-900 shadow dark:bg-stone-900 dark:text-stone-50'
-                  : 'text-stone-600 dark:text-stone-400'
-              }`}
+              className={`rounded-full px-3.5 py-1 font-mono text-[0.72rem] font-bold uppercase tracking-wide ${isDark === false
+                ? 'bg-white text-stone-900 shadow dark:bg-stone-900 dark:text-stone-50'
+                : 'text-stone-600 dark:text-stone-400'
+                }`}
             >
               L
             </button>
@@ -321,11 +316,10 @@ export function TennisApp() {
               type="button"
               aria-label="Dark mode"
               onClick={() => applyTheme(true)}
-              className={`rounded-full px-3.5 py-1 font-mono text-[0.72rem] font-bold uppercase tracking-wide ${
-                isDark === true
-                  ? 'bg-white text-stone-900 shadow dark:bg-stone-900 dark:text-stone-50'
-                  : 'text-stone-600 dark:text-stone-400'
-              }`}
+              className={`rounded-full px-3.5 py-1 font-mono text-[0.72rem] font-bold uppercase tracking-wide ${isDark === true
+                ? 'bg-white text-stone-900 shadow dark:bg-stone-900 dark:text-stone-50'
+                : 'text-stone-600 dark:text-stone-400'
+                }`}
             >
               D
             </button>
@@ -341,11 +335,10 @@ export function TennisApp() {
               key={id}
               type="button"
               onClick={() => setTab(id)}
-              className={`relative flex flex-1 items-center justify-center gap-1.5 py-2.5 pb-3 text-[0.82rem] font-semibold tracking-wide transition-colors after:absolute after:bottom-0 after:left-[10%] after:h-0.5 after:w-4/5 after:rounded-sm after:bg-green-600 after:opacity-0 after:transition-opacity dark:after:bg-green-400 ${
-                tab === id
-                  ? 'text-stone-900 after:opacity-100 dark:text-stone-50'
-                  : 'text-stone-600 dark:text-stone-400'
-              }`}
+              className={`relative flex flex-1 items-center justify-center gap-1.5 py-2.5 pb-3 text-[0.82rem] font-semibold tracking-wide transition-colors after:absolute after:bottom-0 after:left-[10%] after:h-0.5 after:w-4/5 after:rounded-sm after:bg-green-600 after:opacity-0 after:transition-opacity dark:after:bg-green-400 ${tab === id
+                ? 'text-stone-900 after:opacity-100 dark:text-stone-50'
+                : 'text-stone-600 dark:text-stone-400'
+                }`}
             >
               {dot ? (
                 <span className="inline-block h-[7px] w-[7px] animate-live-pulse rounded-full bg-red-600 dark:bg-red-400" />
@@ -390,7 +383,7 @@ export function TennisApp() {
         aria-label="Refresh scores"
         disabled={refreshing}
         onClick={loadAll}
-        className="fixed bottom-4 right-4 z-[200] flex h-8 w-8 items-center justify-center rounded-full bg-stone-900 text-white shadow-lg disabled:cursor-default disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900"
+        className="fixed bottom-4 right-4 z-[200] flex h-8 w-8 items-center justify-center rounded-full bg-stone-400 text-stone-700 shadow-lg disabled:cursor-default disabled:opacity-50 dark:bg-stone-900 dark:text-stone-200"
       >
         <svg
           className={refreshing ? 'animate-fab-spin' : ''}
