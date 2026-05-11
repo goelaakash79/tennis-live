@@ -1,23 +1,63 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ── Tailwind Stone (taupe) palette ── */
+
+/* Light (default) */
 :root {
-  --green: #2ecc71;
-  --green-dark: #27ae60;
-  --green-dim: rgba(46, 204, 113, 0.12);
-  --red: #e74c3c;
-  --red-dim: rgba(231, 76, 60, 0.12);
-  --blue: #3498db;
-  --yellow: #f39c12;
-  --bg: #0f1117;
-  --bg2: #161b27;
-  --bg3: #1e2535;
-  --bg4: #252d3d;
-  --border: rgba(255,255,255,0.07);
-  --text: #f0f2f7;
-  --text2: #8b93a8;
-  --text3: #5c6478;
+  --green: #16a34a; /* green-700  */
+  --green-dark: #15803d;
+  --green-dim: rgba(22, 163, 74, 0.1);
+  --red: #dc2626;   /* red-600    */
+  --red-dim: rgba(220, 38, 38, 0.1);
+  --yellow: #d97706; /* amber-600  */
+  --bg:     #fafaf9; /* stone-50  */
+  --bg2:    #ffffff;
+  --bg3:    #f5f5f4; /* stone-100 */
+  --bg4:    #e7e5e4; /* stone-200 */
+  --border: #d6d3d1; /* stone-300 */
+  --text:   #1c1917; /* stone-900 */
+  --text2:  #57534e; /* stone-600 */
+  --text3:  #a8a29e; /* stone-400 */
   --radius: 14px;
   --radius-sm: 8px;
+}
+
+/* Dark (OS preference) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --green: #4ade80; /* green-400  */
+    --green-dark: #22c55e;
+    --green-dim: rgba(74, 222, 128, 0.12);
+    --red: #f87171;   /* red-400    */
+    --red-dim: rgba(248, 113, 113, 0.12);
+    --yellow: #fbbf24; /* amber-400  */
+    --bg:     #0c0a09; /* stone-950 */
+    --bg2:    #1c1917; /* stone-900 */
+    --bg3:    #292524; /* stone-800 */
+    --bg4:    #44403c; /* stone-700 */
+    --border: rgba(87, 83, 78, 0.4); /* stone-600/40 */
+    --text:   #fafaf9; /* stone-50  */
+    --text2:  #a8a29e; /* stone-400 */
+    --text3:  #57534e; /* stone-600 */
+  }
+}
+
+/* Manual overrides (toggle button) */
+[data-theme="light"] {
+  --green: #16a34a; --green-dark: #15803d;
+  --green-dim: rgba(22, 163, 74, 0.1);
+  --red: #dc2626; --red-dim: rgba(220, 38, 38, 0.1);
+  --yellow: #d97706;
+  --bg: #fafaf9; --bg2: #ffffff; --bg3: #f5f5f4; --bg4: #e7e5e4;
+  --border: #d6d3d1; --text: #1c1917; --text2: #57534e; --text3: #a8a29e;
+}
+[data-theme="dark"] {
+  --green: #4ade80; --green-dark: #22c55e;
+  --green-dim: rgba(74, 222, 128, 0.12);
+  --red: #f87171; --red-dim: rgba(248, 113, 113, 0.12);
+  --yellow: #fbbf24;
+  --bg: #0c0a09; --bg2: #1c1917; --bg3: #292524; --bg4: #44403c;
+  --border: rgba(87, 83, 78, 0.4); --text: #fafaf9; --text2: #a8a29e; --text3: #57534e;
 }
 
 html { font-size: 16px; }
@@ -63,6 +103,24 @@ body {
   padding: 4px 10px;
   border-radius: 20px;
 }
+
+.theme-toggle {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-size: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s;
+  line-height: 1;
+}
+.theme-toggle:active { opacity: 0.7; }
 
 /* ── TABS ── */
 .tab-nav {

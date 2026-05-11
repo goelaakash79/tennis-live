@@ -264,6 +264,25 @@ function updateLiveBadge(count) {
   }
 }
 
+// ── THEME TOGGLE ──
+
+(function () {
+  const root = document.documentElement;
+  const btn = document.getElementById('theme-toggle');
+  const stored = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = stored ? stored === 'dark' : prefersDark;
+
+  function apply(dark) {
+    root.setAttribute('data-theme', dark ? 'dark' : 'light');
+    btn.textContent = dark ? '☀︎' : '☾';
+    localStorage.setItem('theme', dark ? 'dark' : 'light');
+  }
+
+  apply(isDark);
+  btn.addEventListener('click', () => apply(root.getAttribute('data-theme') !== 'dark'));
+})();
+
 // ── INIT ──
 
 document.getElementById('header-date').textContent =
