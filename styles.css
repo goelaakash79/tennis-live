@@ -192,26 +192,33 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-.match-status {
+.match-status,
+.match-round,
+.match-court,
+.match-time,
+.match-duration,
+.section-label,
+.header-date {
   font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+}
+
+.match-status {
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.6px;
-  text-transform: uppercase;
 }
 .status-live { color: var(--red); }
 .status-upcoming { color: var(--yellow); }
 .status-past { color: var(--text3); }
 
 .match-round {
-  font-family: 'JetBrains Mono', monospace;
   font-size: 0.68rem;
   color: var(--text2);
   font-weight: 500;
 }
 
 .match-court {
-  font-family: 'JetBrains Mono', monospace;
   font-size: 0.68rem;
   font-weight: 600;
   color: var(--green);
