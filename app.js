@@ -162,18 +162,14 @@ function renderFlat(matches, descending = false) {
   const sorted = [...matches].sort((a, b) =>
     descending ? (b.startMs || 0) - (a.startMs || 0) : (a.startMs || 0) - (b.startMs || 0)
   );
-  let lastTournId = null;
+  let lastTournName = null;
   return sorted.map(m => {
     let header = '';
-    if (m.tournament.id !== lastTournId) {
-      lastTournId = m.tournament.id;
-      const tourBadge = m.tournament.tour
-        ? `<span class="tournament-tour tour-${m.tournament.tour.toLowerCase()}">${m.tournament.tour}</span>`
-        : '';
+    if (m.tournament.name !== lastTournName) {
+      lastTournName = m.tournament.name;
       header = `<div class="flat-tourn-label">
         <span class="tournament-flag">${m.tournament.flag}</span>
         <span class="flat-tourn-name">${m.tournament.name}</span>
-        ${tourBadge}
       </div>`;
     }
     return header + renderMatch(m);
