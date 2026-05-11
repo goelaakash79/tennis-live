@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply text-base;
+  }
+}
+
+@layer utilities {
+  .scrollbar-stone::-webkit-scrollbar {
+    width: 4px;
+  }
+  .scrollbar-stone::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  .scrollbar-stone::-webkit-scrollbar-thumb {
+    @apply rounded bg-stone-300 dark:bg-stone-600;
+  }
+}
