@@ -226,7 +226,8 @@ body {
   margin-top: 1px;
 }
 
-.tournament-surface {
+.tournament-surface,
+.tournament-tour {
   font-size: 0.7rem;
   font-weight: 600;
   padding: 3px 9px;
@@ -234,7 +235,11 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
 }
+
+.tour-atp { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.tour-wta { background: rgba(236,72,153,0.15);  color: #f472b6; }
 .surface-hard { background: rgba(52,152,219,0.15); color: #5daee8; }
 .surface-clay { background: rgba(196,108,60,0.15); color: #e08860; }
 .surface-grass { background: rgba(46,204,113,0.15); color: #5ecc88; }

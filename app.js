@@ -125,7 +125,8 @@ function renderMatch(match) {
 }
 
 function renderTournamentGroup(tournament, matches) {
-  const { name, location, surface, flag } = tournament;
+  const { name, location, surface, flag, tour } = tournament;
+  const tourHtml = tour ? `<span class="tournament-tour tour-${tour.toLowerCase()}">${tour}</span>` : '';
   return `
     <div class="tournament-group">
       <div class="tournament-header">
@@ -134,6 +135,7 @@ function renderTournamentGroup(tournament, matches) {
           <div class="tournament-name">${name}</div>
           ${location ? `<div class="tournament-meta">${location}</div>` : ''}
         </div>
+        ${tourHtml}
         ${surface ? `<span class="tournament-surface ${surfaceClass(surface)}">${surface}</span>` : ''}
       </div>
       ${matches.map(renderMatch).join('')}
