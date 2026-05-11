@@ -86,23 +86,6 @@ body {
   padding: 14px 16px 10px;
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1.15rem;
-  letter-spacing: -0.3px;
-}
-.logo-icon { font-size: 1.3rem; }
-.logo-text strong { color: var(--green); }
-
-.header-date {
-  font-size: 0.75rem;
-  color: var(--text2);
-  background: var(--bg3);
-  padding: 4px 10px;
-  border-radius: 20px;
-}
 
 .header-actions {
   display: flex;
@@ -141,12 +124,6 @@ body {
 .theme-toggle { font-size: 1rem; }
 
 /* ── TOUR FILTER ── */
-.filter-bar {
-  display: flex;
-  justify-content: center;
-  padding: 8px 16px 10px;
-}
-
 .tour-filter {
   display: inline-flex;
   background: var(--bg3);
