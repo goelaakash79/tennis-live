@@ -169,12 +169,10 @@ function renderError(msg) {
 
 // ── DATA FETCHING ──
 
-let cache = { live: null, today: null, yesterday: null };
-
 async function fetchAllMatches() {
   const res = await fetch('/api/matches');
   if (!res.ok) throw new Error(`API error ${res.status}`);
-  return res.json(); // { live, upcoming, past }
+  return res.json();
 }
 
 // ── RENDER TABS ──
@@ -187,7 +185,6 @@ function renderLiveTab(matches) {
 function renderUpcomingTab(upcoming) {
   if (!upcoming.length) return renderEmpty('No upcoming matches scheduled.');
 
-  // group by date
   const byDate = new Map();
   upcoming.forEach(m => {
     const k = localDateFromMs(m.startMs) || m.date || 'Unknown date';
@@ -217,11 +214,19 @@ function renderResultsTab(past) {
   }).join('');
 }
 
+// ── REFRESH BUTTON ──
+
+const refreshBtn = document.getElementById('refresh-btn');
+
+function setRefreshing(active) {
+  refreshBtn.classList.toggle('spinning', active);
+  refreshBtn.disabled = active;
+}
+
 // ── MAIN LOAD ──
 
-let refreshTimer = null;
-
 async function loadAll() {
+  setRefreshing(true);
   document.getElementById('tab-live').innerHTML     = renderSkeleton(3);
   document.getElementById('tab-upcoming').innerHTML = renderSkeleton(4);
   document.getElementById('tab-past').innerHTML     = renderSkeleton(3);
@@ -236,15 +241,20 @@ async function loadAll() {
     ['tab-live', 'tab-upcoming', 'tab-past'].forEach(id => {
       document.getElementById(id).innerHTML = renderError(err.message);
     });
+  } finally {
+    setRefreshing(false);
   }
 }
 
 async function refreshLive() {
+  setRefreshing(true);
   try {
     const data = await fetchAllMatches();
     document.getElementById('tab-live').innerHTML = renderLiveTab(data.live || []);
     updateLiveBadge((data.live || []).length);
-  } catch (e) { /* silent */ }
+  } catch (e) { /* silent */ } finally {
+    setRefreshing(false);
+  }
 }
 
 function updateLiveBadge(count) {
@@ -285,7 +295,6 @@ function updateLiveBadge(count) {
 
 // ── INIT ──
 
-
 // Tab switching
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -296,7 +305,18 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
+// Manual refresh
+refreshBtn.addEventListener('click', loadAll);
+
 loadAll();
 
 // Auto-refresh live data every 30 seconds
 setInterval(refreshLive, 30_000);
+
+// ── SERVICE WORKER ──
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
