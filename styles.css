@@ -193,6 +193,7 @@ body {
 }
 
 .match-status {
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.6px;
@@ -203,12 +204,14 @@ body {
 .status-past { color: var(--text3); }
 
 .match-round {
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.68rem;
   color: var(--text2);
   font-weight: 500;
 }
 
 .match-court {
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.68rem;
   font-weight: 600;
   color: var(--green);
