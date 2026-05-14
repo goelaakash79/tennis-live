@@ -86,8 +86,8 @@ export function TennisHeader({
             ) : null}
             {label}
             {id === 'live' && liveCount > 0 ? (
-              <span className="ml-1 min-w-4 h-4 rounded-full bg-red-600 px-1 py-px text-center text-[0.6rem] font-extrabold text-white">
-                {liveCount}
+              <span className="text-xs font-medium font-mono">
+                • {liveCount}
               </span>
             ) : null}
           </button>

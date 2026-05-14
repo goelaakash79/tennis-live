@@ -36,8 +36,8 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={jetbrainsMono.variable} suppressHydrationWarning>
-      <body className="scrollbar-stone min-h-dvh bg-stone-50 font-sans text-stone-900 antialiased dark:bg-stone-950 dark:text-stone-50">
+    <html lang="en" className={`${jetbrainsMono.variable} scrollbar-hide`} suppressHydrationWarning>
+      <body className="scrollbar-hide min-h-dvh bg-stone-50 font-sans text-stone-900 antialiased dark:bg-stone-950 dark:text-stone-50">
         <Script id="theme-init" strategy="beforeInteractive">
           {`(function(){try{var s=localStorage.getItem('theme');var d=s?s==='dark':window.matchMedia('(prefers-color-scheme:dark)').matches;document.documentElement.classList.toggle('dark',d);}catch(e){}})();`}
         </Script>

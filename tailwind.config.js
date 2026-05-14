@@ -32,19 +32,12 @@ module.exports = {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.5' },
         },
-        /** Shifts a wide linear-gradient so a live card “sync ring” appears to move */
-        'live-border-flow': {
-          '0%': { backgroundPosition: '0% 50%' },
-          '100%': { backgroundPosition: '100% 50%' },
-        },
       },
       animation: {
         'fab-spin': 'fab-spin 0.7s linear infinite',
         'live-pulse': 'live-pulse 1.5s ease-in-out infinite',
         shimmer: 'shimmer 1.4s infinite',
         blink: 'blink 1s ease-in-out infinite',
-        'live-border-flow': 'live-border-flow 2.6s ease-in-out infinite',
-        'live-border-flow-fast': 'live-border-flow 1.35s ease-in-out infinite',
       },
     },
   },

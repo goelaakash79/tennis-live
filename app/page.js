@@ -4,7 +4,6 @@ import { fetchTennis } from '@/lib/tennis';
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const initialFetchedAt = Date.now();
   let initialData = null;
   let initialError = null;
   try {
@@ -16,7 +15,6 @@ export default async function Home() {
     <TennisApp
       initialData={initialData}
       initialError={initialError}
-      initialFetchedAt={initialData != null ? initialFetchedAt : null}
     />
   );
 }

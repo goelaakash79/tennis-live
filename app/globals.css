@@ -9,13 +9,14 @@
 }
 
 @layer utilities {
-  .scrollbar-stone::-webkit-scrollbar {
-    width: 4px;
+  /** Hide scrollbars while keeping scroll (Chrome, Safari, Firefox, legacy Edge). */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
-  .scrollbar-stone::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
-  .scrollbar-stone::-webkit-scrollbar-thumb {
-    @apply rounded bg-stone-300 dark:bg-stone-600;
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
 }

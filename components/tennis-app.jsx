@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { SCORE_POLL_MS, SCORE_SOON_MS } from '@/components/tennis/tennis-constants';
+import { SCORE_POLL_MS } from '@/components/tennis/tennis-constants';
 import { TennisHeader } from '@/components/tennis/tennis-header';
 import { TennisMainPanel } from '@/components/tennis/tennis-main-panel';
 import { RefreshFab } from '@/components/tennis/refresh-fab';
@@ -9,7 +9,6 @@ import { RefreshFab } from '@/components/tennis/refresh-fab';
 export function TennisApp({
   initialData = null,
   initialError = null,
-  initialFetchedAt = null,
 }) {
   const [tab, setTab] = useState('live');
   const [tourFilter, setTourFilter] = useState('all');
@@ -21,10 +20,6 @@ export function TennisApp({
   const [isDark, setIsDark] = useState(null);
   const [favoriteIds, setFavoriteIds] = useState(new Set());
   const initialLoadRef = useRef(!initialData);
-  const [lastSuccessfulPollAt, setLastSuccessfulPollAt] = useState(
-    () => (initialFetchedAt != null ? initialFetchedAt : initialData ? Date.now() : null),
-  );
-  const [pollClock, setPollClock] = useState(0);
   const [needsClientBootstrap] = useState(() => !initialData && !initialError);
   const clientBootstrapOnce = useRef(false);
 
@@ -85,23 +80,6 @@ export function TennisApp({
     };
   }, [lastData, tourFilter, showFavoritesOnly, favoriteIds]);
 
-  const liveMatchCount = (lastData?.live || []).length;
-
-  useEffect(() => {
-    if (skeletonTabs || liveMatchCount === 0) return;
-    const id = setInterval(() => setPollClock((n) => n + 1), 400);
-    return () => clearInterval(id);
-  }, [skeletonTabs, liveMatchCount]);
-
-  const liveScoreSync =
-    refreshing
-      ? 'syncing'
-      : lastSuccessfulPollAt == null
-        ? 'idle'
-        : lastSuccessfulPollAt + SCORE_POLL_MS - (Date.now() + pollClock * 0) <= SCORE_SOON_MS
-          ? 'soon'
-          : 'idle';
-
   const loadAll = useCallback(async () => {
     setRefreshing(true);
     setError(null);
@@ -113,7 +91,6 @@ export function TennisApp({
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setLastData(data);
-      setLastSuccessfulPollAt(Date.now());
       initialLoadRef.current = false;
     } catch (err) {
       setError(err.message || 'Something went wrong');
@@ -132,7 +109,6 @@ export function TennisApp({
       const data = await res.json();
       if (data.error) return;
       setLastData(data);
-      setLastSuccessfulPollAt(Date.now());
     } catch {
       /* silent */
     } finally {
@@ -166,9 +142,8 @@ export function TennisApp({
     (match) => ({
       isFavorite: favoriteIds.has(String(match.id)),
       onToggleFavorite: toggleFavorite,
-      liveScoreSync: match.status === 'live' ? liveScoreSync : 'idle',
     }),
-    [favoriteIds, toggleFavorite, liveScoreSync],
+    [favoriteIds, toggleFavorite],
   );
 
   return (
