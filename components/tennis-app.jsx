@@ -360,11 +360,10 @@ export function TennisApp() {
               </div>
               {g.tournament.tour ? (
                 <span
-                  className={`shrink-0 rounded-full px-2 py-0.5 font-mono text-[0.7rem] font-semibold uppercase tracking-wide ${
-                    g.tournament.tour === 'ATP'
+                  className={`shrink-0 rounded-full px-2 py-0.5 font-mono text-[0.7rem] font-semibold uppercase tracking-wide ${g.tournament.tour === 'ATP'
                       ? 'bg-blue-500/15 text-blue-400'
                       : 'bg-pink-500/15 text-pink-400'
-                  }`}
+                    }`}
                 >
                   {g.tournament.tour}
                 </span>
@@ -412,9 +411,8 @@ export function TennisApp() {
               type="button"
               aria-label={showFavoritesOnly ? 'Show all matches' : 'Show favorites only'}
               onClick={() => setShowFavoritesOnly((prev) => !prev)}
-              className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-sm transition-colors ${
-                showFavoritesOnly ? 'text-red-500 dark:text-red-400' : 'text-stone-500 dark:text-stone-400'
-              }`}
+              className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-sm transition-colors ${showFavoritesOnly ? 'text-red-500 dark:text-red-400' : 'text-stone-500 dark:text-stone-400'
+                }`}
               title={showFavoritesOnly ? 'Favorites only' : 'All matches'}
             >
               {showFavoritesOnly ? '♥' : '♡'}
@@ -512,9 +510,8 @@ export function TennisApp() {
                   return entries.map(([date, ms], idx) => (
                     <div key={date}>
                       <div
-                        className={`mb-3 flex items-center gap-2 px-0.5 font-mono text-[0.72rem] font-bold uppercase tracking-wide text-stone-400 dark:text-stone-500 ${
-                          idx === 0 ? 'mt-0' : 'mt-5'
-                        }`}
+                        className={`mb-3 flex items-center gap-2 px-0.5 font-mono text-[0.72rem] font-bold uppercase tracking-wide text-stone-400 dark:text-stone-500 ${idx === 0 ? 'mt-0' : 'mt-5'
+                          }`}
                       >
                         {fmtDate(date)}
                         <span className="h-px flex-1 bg-stone-200 dark:bg-stone-600/40" />
@@ -549,9 +546,8 @@ export function TennisApp() {
                   return entries.map(([date, ms], idx) => (
                     <div key={date}>
                       <div
-                        className={`mb-3 flex items-center gap-2 px-0.5 font-mono text-[0.72rem] font-bold uppercase tracking-wide text-stone-400 dark:text-stone-500 ${
-                          idx === 0 ? 'mt-0' : 'mt-5'
-                        }`}
+                        className={`mb-3 flex items-center gap-2 px-0.5 font-mono text-[0.72rem] font-bold uppercase tracking-wide text-stone-400 dark:text-stone-500 ${idx === 0 ? 'mt-0' : 'mt-5'
+                          }`}
                       >
                         {fmtDate(date)}
                         <span className="h-px flex-1 bg-stone-200 dark:bg-stone-600/40" />

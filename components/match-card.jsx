@@ -17,18 +17,19 @@ function PlayerFlag({ p }) {
       </span>
     );
   }
-  return (
-    <span className="inline-flex min-w-[1.4rem] flex-shrink-0 items-center justify-center rounded px-1 py-0.5 font-mono text-[0.6rem] font-bold uppercase tracking-wide text-stone-600 dark:text-stone-400 bg-stone-200 dark:bg-stone-700">
-      {p.flagCode || '?'}
-    </span>
-  );
+  if (p.flagCode) {
+    return (
+      <span className="inline-flex min-w-[1.4rem] flex-shrink-0 items-center justify-center rounded px-1 py-0.5 font-mono text-[0.6rem] font-bold uppercase tracking-wide text-stone-600 dark:text-stone-400 bg-stone-200 dark:bg-stone-700">
+        {p.flagCode}
+      </span>
+    );
+  }
+  return <span className="min-w-[1.4rem] flex-shrink-0" />;
 }
 
 function buildSetScores(match) {
-  const { sets, status, currentGame, p1, p2 } = match;
+  const { sets, status, currentGame } = match;
   if (!sets?.length) return null;
-
-  const servingP1 = p1.serving;
 
   const p1Cols = sets.map((s, i) => {
     const isLast = i === sets.length - 1 && status === 'live';
@@ -36,8 +37,9 @@ function buildSetScores(match) {
     return (
       <div
         key={`p1-${i}`}
-        className={`w-[22px] text-center font-mono text-[0.88rem] font-bold tabular-nums sm:w-[26px] sm:text-[0.95rem] ${won ? 'text-stone-900 dark:text-stone-50' : 'text-stone-600 dark:text-stone-400'
-          } ${isLast ? 'w-6 rounded bg-red-500/10 text-red-600 dark:text-red-400' : ''}`}
+        className={`w-[22px] text-center font-mono text-[0.88rem] font-bold tabular-nums sm:w-[26px] sm:text-[0.95rem] ${
+          won ? 'text-stone-900 dark:text-stone-50' : 'text-stone-600 dark:text-stone-400'
+        } ${isLast ? 'w-6 rounded bg-red-500/10 text-red-600 dark:text-red-400' : ''}`}
       >
         {s.p1}
       </div>
@@ -50,8 +52,9 @@ function buildSetScores(match) {
     return (
       <div
         key={`p2-${i}`}
-        className={`w-[22px] text-center font-mono text-[0.88rem] font-bold tabular-nums sm:w-[26px] sm:text-[0.95rem] ${won ? 'text-stone-900 dark:text-stone-50' : 'text-stone-600 dark:text-stone-400'
-          } ${isLast ? 'w-6 rounded bg-red-500/10 text-red-600 dark:text-red-400' : ''}`}
+        className={`w-[22px] text-center font-mono text-[0.88rem] font-bold tabular-nums sm:w-[26px] sm:text-[0.95rem] ${
+          won ? 'text-stone-900 dark:text-stone-50' : 'text-stone-600 dark:text-stone-400'
+        } ${isLast ? 'w-6 rounded bg-red-500/10 text-red-600 dark:text-red-400' : ''}`}
       >
         {s.p2}
       </div>
@@ -62,18 +65,12 @@ function buildSetScores(match) {
   let p2game = null;
   if (status === 'live' && currentGame) {
     p1game = (
-      <div className="flex min-w-[26px] items-center justify-center gap-0.5 rounded bg-green-600/10 px-0 py-px font-mono text-[0.75rem] font-bold text-green-600 dark:bg-green-400/10 dark:text-green-400">
-        {servingP1 ? (
-          <span className="text-[0.5rem] leading-none text-green-600 dark:text-green-400">●</span>
-        ) : null}
+      <div className="flex min-w-[26px] items-center justify-center rounded bg-green-600/10 px-0 py-px font-mono text-[0.75rem] font-bold text-green-600 dark:bg-green-400/10 dark:text-green-400">
         {currentGame.p1}
       </div>
     );
     p2game = (
-      <div className="flex min-w-[26px] items-center justify-center gap-0.5 rounded bg-green-600/10 px-0 py-px font-mono text-[0.75rem] font-bold text-green-600 dark:bg-green-400/10 dark:text-green-400">
-        {!servingP1 ? (
-          <span className="text-[0.5rem] leading-none text-green-600 dark:text-green-400">●</span>
-        ) : null}
+      <div className="flex min-w-[26px] items-center justify-center rounded bg-green-600/10 px-0 py-px font-mono text-[0.75rem] font-bold text-green-600 dark:bg-green-400/10 dark:text-green-400">
         {currentGame.p2}
       </div>
     );
@@ -112,13 +109,19 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
   const leftMins = totalMins % 60;
   const countdownLabel = `Starts in ${leftHours ? `${leftHours}h ` : ''}${leftMins}m`;
 
+  const surface = match.tournament?.surface;
+  const courtLabel = court || null;
+  const surfaceLabel = !courtLabel && surface ? surface.charAt(0).toUpperCase() + surface.slice(1) : null;
+
   return (
     <div
-      className={`mb-2.5 overflow-hidden rounded-[14px] border bg-white transition-transform active:scale-[0.985] dark:bg-stone-900 ${isLive
-        ? 'border-red-500/30 shadow-[0_0_0_1px_rgba(231,76,60,0.1),0_4px_20px_rgba(231,76,60,0.08)]'
-        : 'border-stone-200 dark:border-stone-700'
-        }`}
+      className={`mb-2.5 overflow-hidden rounded-[14px] border bg-white transition-transform active:scale-[0.985] dark:bg-stone-900 ${
+        isLive
+          ? 'border-red-500/30 shadow-[0_0_0_1px_rgba(231,76,60,0.1),0_4px_20px_rgba(231,76,60,0.08)]'
+          : 'border-stone-200 dark:border-stone-700'
+      }`}
     >
+      {/* Top bar */}
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-stone-200 bg-stone-100 px-3.5 py-2 dark:border-stone-600/40 dark:bg-stone-800">
         {isLive && (
           <span className="font-mono text-[0.68rem] font-bold uppercase tracking-wide text-red-600 dark:text-red-400">
@@ -130,7 +133,7 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
             Completed
           </span>
         )}
-        {!isLive && !isPast && (
+        {isUpcoming && (
           <span className="font-mono text-[0.68rem] font-bold uppercase tracking-wide text-amber-600 dark:text-amber-400">
             Upcoming
           </span>
@@ -140,26 +143,43 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
             {round}
           </span>
         ) : null}
-        {court ? (
+        {courtLabel ? (
           <span className="ml-auto shrink-0 rounded-full bg-green-600/10 px-2 py-0.5 font-mono text-[0.68rem] font-semibold text-green-700 dark:text-green-400">
-            {court}
+            {courtLabel}
+          </span>
+        ) : surfaceLabel ? (
+          <span
+            className={`ml-auto shrink-0 rounded-full px-2 py-0.5 font-mono text-[0.68rem] font-semibold ${
+              SURFACE_BADGE[surface] || SURFACE_BADGE.hard
+            }`}
+          >
+            {surfaceLabel}
           </span>
         ) : null}
       </div>
+
+      {/* Players + scores */}
       <div className="px-3.5 py-3">
         <div className="flex flex-col gap-2.5">
+          {/* Player 1 */}
           <div className="flex items-center gap-2.5">
             <PlayerFlag p={p1} />
             <span
-              className={`min-w-0 flex-1 truncate text-[0.9rem] font-semibold tracking-tight sm:text-[0.95rem] ${p1IsWinner
-                ? 'font-bold text-stone-900 dark:text-stone-50'
-                : 'text-stone-600 dark:text-stone-400'
-                }`}
+              className={`min-w-0 flex-1 truncate text-[0.9rem] font-semibold tracking-tight sm:text-[0.95rem] ${
+                p1IsWinner
+                  ? 'font-bold text-stone-900 dark:text-stone-50'
+                  : 'text-stone-600 dark:text-stone-400'
+              }`}
             >
               {p1.name}
               {p1.rank ? (
                 <span className="ml-1 text-[0.65rem] font-normal text-stone-400 dark:text-stone-500">
                   #{p1.rank}
+                </span>
+              ) : null}
+              {isLive && p1.serving ? (
+                <span className="ml-1.5 text-[0.85rem] leading-none" aria-label="Serving">
+                  🎾
                 </span>
               ) : null}
             </span>
@@ -169,14 +189,18 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
               <span className="font-mono text-[0.75rem] italic text-stone-400">vs</span>
             )}
           </div>
+
           <div className="h-px bg-stone-200 dark:bg-stone-600/40" />
+
+          {/* Player 2 */}
           <div className="flex items-center gap-2.5">
             <PlayerFlag p={p2} />
             <span
-              className={`min-w-0 flex-1 truncate text-[0.9rem] font-semibold tracking-tight sm:text-[0.95rem] ${p2IsWinner
-                ? 'font-bold text-stone-900 dark:text-stone-50'
-                : 'text-stone-600 dark:text-stone-400'
-                }`}
+              className={`min-w-0 flex-1 truncate text-[0.9rem] font-semibold tracking-tight sm:text-[0.95rem] ${
+                p2IsWinner
+                  ? 'font-bold text-stone-900 dark:text-stone-50'
+                  : 'text-stone-600 dark:text-stone-400'
+              }`}
             >
               {p2.name}
               {p2.rank ? (
@@ -184,17 +208,30 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
                   #{p2.rank}
                 </span>
               ) : null}
+              {isLive && p2.serving ? (
+                <span className="ml-1.5 text-[0.85rem] leading-none" aria-label="Serving">
+                  🎾
+                </span>
+              ) : null}
             </span>
             {scoreCols ? scoreCols.p2 : null}
           </div>
         </div>
       </div>
+
+      {/* Footer */}
       <div className="flex items-center justify-between border-t border-stone-200 px-3.5 py-2 dark:border-stone-600/40">
-        <span className="flex items-center gap-1.5 font-mono text-[0.75rem] text-stone-600 dark:text-stone-400">
-          <span className="text-[0.8rem] opacity-60">🕐</span>
-          {timeLabel}
-        </span>
-        <div className="flex items-center gap-2">
+        {!isLive ? (
+          <span className="flex items-center gap-1.5 font-mono text-[0.75rem] text-stone-600 dark:text-stone-400">
+            <span className="text-[0.8rem] opacity-60" aria-hidden>
+              🕐
+            </span>
+            {timeLabel}
+          </span>
+        ) : (
+          <div className="min-w-0 flex-1" aria-hidden />
+        )}
+        <div className="flex shrink-0 items-center gap-2">
           {showCountdown ? (
             <span className="rounded-full bg-amber-500/10 px-4 py-0.5 font-mono text-[10px] font-semibold text-amber-800 dark:text-amber-400 uppercase">
               {countdownLabel}
@@ -214,10 +251,11 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
             onClick={() => onToggleFavorite?.(match.id)}
             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
             title={isFavorite ? 'Unfavorite' : 'Favorite'}
-            className={`rounded-full p-1.5 transition-colors ${isFavorite
-              ? 'text-red-500 hover:bg-red-500/10'
-              : 'text-stone-400 hover:bg-stone-200 dark:text-stone-500 dark:hover:bg-stone-700'
-              }`}
+            className={`rounded-full p-1.5 transition-colors ${
+              isFavorite
+                ? 'text-red-500 hover:bg-red-500/10'
+                : 'text-stone-400 hover:bg-stone-200 dark:text-stone-500 dark:hover:bg-stone-700'
+            }`}
           >
             <svg
               viewBox="0 0 24 24"
