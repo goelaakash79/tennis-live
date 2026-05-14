@@ -92,7 +92,7 @@ function buildSetScores(match) {
   };
 }
 
-export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
+export function MatchCard({ match, isFavorite = false, onToggleFavorite, liveScoreSync = 'idle' }) {
   const { status, round, court, date, p1, p2, winner, currentGame } = match;
   const isLive = status === 'live';
   const isPast = status === 'past';
@@ -113,13 +113,23 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
   const courtLabel = court || null;
   const surfaceLabel = !courtLabel && surface ? surface.charAt(0).toUpperCase() + surface.slice(1) : null;
 
-  return (
+  const showSyncRing = isLive && (liveScoreSync === 'soon' || liveScoreSync === 'syncing');
+  const ringSoon = liveScoreSync === 'soon';
+  const ringClasses = ringSoon
+    ? 'bg-gradient-to-r from-teal-500/35 via-sky-500/45 to-indigo-500/35 bg-[length:240%_100%] animate-live-border-flow dark:from-teal-400/25 dark:via-sky-400/38 dark:to-indigo-400/25'
+    : 'bg-gradient-to-r from-teal-500/50 via-sky-500/60 to-indigo-500/50 bg-[length:240%_100%] animate-live-border-flow-fast dark:from-teal-400/40 dark:via-sky-400/52 dark:to-indigo-400/40';
+
+  const innerRadius = showSyncRing ? 'rounded-[13px]' : 'rounded-[14px]';
+  const borderClass =
+    isLive && !showSyncRing
+      ? 'border border-stone-200 dark:border-stone-700'
+      : !isLive
+        ? 'border border-stone-200 dark:border-stone-700'
+        : 'border border-transparent';
+
+  const inner = (
     <div
-      className={`mb-2.5 overflow-hidden rounded-[14px] border bg-white transition-transform active:scale-[0.985] dark:bg-stone-900 ${
-        isLive
-          ? 'border-red-500/30 shadow-[0_0_0_1px_rgba(231,76,60,0.1),0_4px_20px_rgba(231,76,60,0.08)]'
-          : 'border-stone-200 dark:border-stone-700'
-      }`}
+      className={`${innerRadius} overflow-hidden bg-white transition-transform active:scale-[0.985] dark:bg-stone-900 ${borderClass}`}
     >
       {/* Top bar */}
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-stone-200 bg-stone-100 px-3.5 py-2 dark:border-stone-600/40 dark:bg-stone-800">
@@ -275,6 +285,16 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
       </div>
     </div>
   );
+
+  if (showSyncRing) {
+    return (
+      <div className={`mb-2.5 rounded-[14px] p-px shadow-sm ${ringClasses}`}>
+        {inner}
+      </div>
+    );
+  }
+
+  return <div className="mb-2.5">{inner}</div>;
 }
 
 export function surfaceBadgeClass(surface) {

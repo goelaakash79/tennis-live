@@ -20,17 +20,8 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(request.url);
 
   if (url.pathname.startsWith('/api/')) {
-    e.respondWith(
-      fetch(request)
-        .then((res) => {
-          if (res.ok) {
-            const clone = res.clone();
-            caches.open(CACHE).then((c) => c.put(request, clone));
-          }
-          return res;
-        })
-        .catch(() => caches.match(request)),
-    );
+    // Live scores: always hit the network; do not cache API responses here.
+    e.respondWith(fetch(request));
     return;
   }
 
