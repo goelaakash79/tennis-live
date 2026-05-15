@@ -9,6 +9,21 @@ const SURFACE_BADGE = {
   indoor: 'bg-[rgba(149,117,205,0.15)] text-[#b39ddb]',
 };
 
+function PlayerNames({ name, isDoubles, className }) {
+  if (isDoubles && name.includes('/')) {
+    return (
+      <span className={`${className} whitespace-normal leading-snug`}>
+        {name.split('/').map((part, i) => (
+          <span key={i} className="block truncate">
+            {part.trim()}
+          </span>
+        ))}
+      </span>
+    );
+  }
+  return <span className={className}>{name}</span>;
+}
+
 function PlayerFlag({ p }) {
   if (p.flagEmoji) {
     return (
@@ -103,7 +118,7 @@ function buildSetScores(match) {
 }
 
 export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
-  const { status, round, court, date, p1, p2, winner } = match;
+  const { status, round, court, date, p1, p2, winner, isDoubles } = match;
   const isLive = status === 'live';
   const isPast = status === 'past';
   const isUpcoming = status === 'upcoming';
@@ -149,6 +164,11 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
         {round ? (
           <span className="font-mono text-[0.68rem] font-medium text-stone-600 dark:text-stone-400">
             {round}
+          </span>
+        ) : null}
+        {isDoubles ? (
+          <span className="rounded-full bg-stone-200/80 px-2 py-0.5 font-mono text-[0.65rem] font-semibold uppercase tracking-wide text-stone-600 dark:bg-stone-700/80 dark:text-stone-300">
+            Doubles
           </span>
         ) : null}
         {(courtLabel || surfaceChip || isLive) ? (
@@ -199,23 +219,27 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
       <div className="px-3.5 py-3">
         <div className="flex flex-col gap-2.5">
           {/* Player 1 */}
-          <div className="flex items-center gap-2.5">
+          <div className={`flex gap-2.5 ${isDoubles ? 'items-start' : 'items-center'}`}>
             <PlayerFlag p={p1} />
-            <span
-              className={`min-w-0 flex-1 truncate text-[0.9rem] font-semibold tracking-tight sm:text-[0.95rem] ${p1IsWinner
-                ? 'font-bold text-stone-900 dark:text-stone-50'
-                : 'text-stone-600 dark:text-stone-400'
-                }`}
-            >
-              {p1.name}
-              {p1.rank != null ? (
-                <span className="ml-1.5 font-mono text-[0.65rem] font-semibold tabular-nums text-stone-500 dark:text-stone-400">
+            <span className="min-w-0 flex-1">
+              <span className="flex min-w-0 items-center gap-1.5">
+                <PlayerNames
+                  name={p1.name}
+                  isDoubles={isDoubles}
+                  className={`min-w-0 text-[0.9rem] font-semibold tracking-tight sm:text-[0.95rem] ${isDoubles ? '' : 'truncate'} ${p1IsWinner
+                    ? 'font-bold text-stone-900 dark:text-stone-50'
+                    : 'text-stone-600 dark:text-stone-400'
+                    }`}
+                />
+                {isLive && p1.serving ? (
+                  <span className="shrink-0 text-[0.85rem] leading-none" aria-label="Serving">
+                    🎾
+                  </span>
+                ) : null}
+              </span>
+              {!isDoubles && p1.rank != null ? (
+                <span className="block font-mono text-[0.65rem] font-semibold tabular-nums text-stone-500 dark:text-stone-400">
                   #{p1.rank}
-                </span>
-              ) : null}
-              {isLive && p1.serving ? (
-                <span className="ml-1.5 text-[0.85rem] leading-none" aria-label="Serving">
-                  🎾
                 </span>
               ) : null}
             </span>
@@ -229,23 +253,27 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
           <div className="h-px bg-stone-200 dark:bg-stone-600/40" />
 
           {/* Player 2 */}
-          <div className="flex items-center gap-2.5">
+          <div className={`flex gap-2.5 ${isDoubles ? 'items-start' : 'items-center'}`}>
             <PlayerFlag p={p2} />
-            <span
-              className={`min-w-0 flex-1 truncate text-[0.9rem] font-semibold tracking-tight sm:text-[0.95rem] ${p2IsWinner
-                ? 'font-bold text-stone-900 dark:text-stone-50'
-                : 'text-stone-600 dark:text-stone-400'
-                }`}
-            >
-              {p2.name}
-              {p2.rank != null ? (
-                <span className="ml-1.5 font-mono text-[0.65rem] font-semibold tabular-nums text-stone-500 dark:text-stone-400">
+            <span className="min-w-0 flex-1">
+              <span className="flex min-w-0 items-center gap-1.5">
+                <PlayerNames
+                  name={p2.name}
+                  isDoubles={isDoubles}
+                  className={`min-w-0 text-[0.9rem] font-semibold tracking-tight sm:text-[0.95rem] ${isDoubles ? '' : 'truncate'} ${p2IsWinner
+                    ? 'font-bold text-stone-900 dark:text-stone-50'
+                    : 'text-stone-600 dark:text-stone-400'
+                    }`}
+                />
+                {isLive && p2.serving ? (
+                  <span className="shrink-0 text-[0.85rem] leading-none" aria-label="Serving">
+                    🎾
+                  </span>
+                ) : null}
+              </span>
+              {!isDoubles && p2.rank != null ? (
+                <span className="block font-mono text-[0.65rem] font-semibold tabular-nums text-stone-500 dark:text-stone-400">
                   #{p2.rank}
-                </span>
-              ) : null}
-              {isLive && p2.serving ? (
-                <span className="ml-1.5 text-[0.85rem] leading-none" aria-label="Serving">
-                  🎾
                 </span>
               ) : null}
             </span>
