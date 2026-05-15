@@ -58,7 +58,7 @@ function buildSetScores(match) {
             : `w-[22px] text-center font-mono text-[0.88rem] font-bold tabular-nums sm:w-[26px] sm:text-[0.95rem] ${won
               ? 'text-stone-900 dark:text-stone-50'
               : 'text-stone-600 dark:text-stone-400'
-              }`
+            }`
         }
       >
         {s.p1}
@@ -78,7 +78,7 @@ function buildSetScores(match) {
             : `w-[22px] text-center font-mono text-[0.88rem] font-bold tabular-nums sm:w-[26px] sm:text-[0.95rem] ${won
               ? 'text-stone-900 dark:text-stone-50'
               : 'text-stone-600 dark:text-stone-400'
-              }`
+            }`
         }
       >
         {s.p2}
@@ -135,8 +135,7 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
   const countdownLabel = `Starts in ${leftHours ? `${leftHours}h ` : ''}${leftMins}m`;
 
   const surface = match.tournament?.surface;
-  const courtLabel = court || null;
-  const surfaceChip = !courtLabel && surface ? surface : null;
+  const venueLabel = court || match.tournament?.location || null;
 
   const borderClass = 'border border-stone-200 dark:border-stone-700';
 
@@ -162,27 +161,31 @@ export function MatchCard({ match, isFavorite = false, onToggleFavorite }) {
           </span>
         )}
         {round ? (
-          <span className="font-mono text-[0.68rem] font-medium text-stone-600 dark:text-stone-400">
+          <span className="font-mono text-[0.68rem] font-medium text-stone-600 dark:text-stone-400 uppercase">
             {round}
           </span>
         ) : null}
         {isDoubles ? (
-          <span className="rounded-full bg-stone-200/80 px-2 py-0.5 font-mono text-[0.65rem] font-semibold uppercase tracking-wide text-stone-600 dark:bg-stone-700/80 dark:text-stone-300">
-            Doubles
+          <span className="font-mono text-[0.68rem] font-semibold uppercase tracking-wide text-stone-600 dark:text-stone-400">
+            • Doubles
           </span>
         ) : null}
-        {(courtLabel || surfaceChip || isLive) ? (
-          <div className="ml-auto flex shrink-0 items-center gap-1.5">
-            {courtLabel ? (
-              <span className="rounded-full bg-green-600/10 px-2 py-0.5 font-mono text-[0.68rem] font-semibold uppercase tracking-wide text-green-700 dark:text-green-400">
-                {courtLabel}
+        {(venueLabel || surface || isLive) ? (
+          <div className="ml-auto flex max-w-[55%] shrink-0 flex-wrap items-center justify-end gap-1.5">
+            {venueLabel ? (
+              <span
+                className="max-w-full truncate rounded-full bg-stone-200 dark:bg-stone-900/40 px-3 py-0.5 font-mono text-[0.68rem] font-semibold text-stone-700 dark:text-stone-300 uppercase"
+                title={venueLabel}
+              >
+                {venueLabel}
               </span>
-            ) : surfaceChip ? (
+            ) : null}
+            {surface ? (
               <span
                 className={`rounded-full px-2 py-0.5 font-mono text-[0.68rem] font-semibold uppercase tracking-wide ${SURFACE_BADGE[surface] || SURFACE_BADGE.hard
                   }`}
               >
-                {surfaceChip}
+                {surface}
               </span>
             ) : null}
             {isLive ? (
